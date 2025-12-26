@@ -106,7 +106,7 @@ func Check() ([]Result, error) {
 	// 节点去重
 	proxies = proxyutils.DeduplicateProxies(proxies)
 	slog.Info(fmt.Sprintf("去重后节点数量: %d", len(proxies)))
-    // 创建节点检测器
+	// 创建节点检测器
 	checker := NewProxyChecker(len(proxies))
 	// 执行节点检测逻辑
 	return checker.run(proxies)
@@ -286,7 +286,7 @@ func (pc *ProxyChecker) updateProxyName(res *Result, httpClient *ProxyClient, sp
 	var tags []string
 	// 获取速度
 	if config.GlobalConfig.SpeedTestUrl != "" {
-		name = regexp.MustCompile(`\s*\|(?:\s*⬇️\s*[\d.]+[KM]B/s)`).ReplaceAllString(name, "")
+		name = regexp.MustCompile(`\s*\|\s*⬇️\s*[\d.]+[KM]B/s`).ReplaceAllString(name, "")
 		var speedStr string
 		if speed < 1024 {
 			speedStr = fmt.Sprintf(" ⬇️ %dKB/s", speed)
@@ -391,7 +391,7 @@ func (pc *ProxyChecker) collectResults() {
 	}
 }
 
-// CreateClient creates and returns an http.Client with a Close function
+// ProxyClient CreateClient creates and returns an http.Client with a Close function
 type ProxyClient struct {
 	*http.Client
 	proxy constant.Proxy
@@ -441,7 +441,10 @@ func (pc *ProxyClient) Close() {
 
 	// 即使这里不关闭，底层GC的时候也会自动关闭
 	if pc.proxy != nil {
-		pc.proxy.Close()
+		err := pc.proxy.Close()
+		if err != nil {
+			return
+		}
 	}
 	pc.Client = nil
 }
