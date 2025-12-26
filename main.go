@@ -9,8 +9,8 @@ import (
 )
 
 var (
-    Version       = "unknown"
-    CurrentCommit = "unknown"
+	Version       = "unknown"
+	CurrentCommit = "unknown"
 )
 
 func main() {

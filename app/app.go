@@ -3,7 +3,6 @@ package app
 import (
 	"flag"
 	"fmt"
-	"github.com/bruceblink/subs-checker/assets"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"runtime/debug"
 	"sync/atomic"
 	"time"
+
+	"github.com/bruceblink/subs-checker/assets"
 
 	"github.com/bruceblink/subs-checker/app/monitor"
 	"github.com/bruceblink/subs-checker/check"

@@ -15,9 +15,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-
-var TempLog string
-
 func init() {
 	// 设置依赖库日志级别
 	if os.Getenv("MIHOMO_DEBUG") != "" {

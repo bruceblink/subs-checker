@@ -51,7 +51,7 @@ func (app *App) loadConfig() error {
 func (app *App) createDefaultConfig() error {
 	slog.Info("配置文件不存在，创建默认配置文件")
 
-	if err := os.WriteFile(app.configPath, []byte(config.DefaultConfigTemplate), 0644); err != nil {
+	if err := os.WriteFile(app.configPath, config.DefaultConfigTemplate, 0644); err != nil {
 		return fmt.Errorf("写入默认配置文件失败: %w", err)
 	}
 

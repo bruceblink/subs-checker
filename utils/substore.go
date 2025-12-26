@@ -61,7 +61,7 @@ const (
 // 用来判断用户是否在运行时更改了覆写订阅的url
 var mihomoOverwriteUrl string
 
-// 基础URL配置
+// BaseURL 基础URL配置
 var BaseURL string
 
 func UpdateSubStore(yamlData []byte) {
