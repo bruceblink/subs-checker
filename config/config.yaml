@@ -153,6 +153,8 @@ success-rate: 0.1
 # 订阅地址 支持 clash/mihomo/v2ray/base64 格式的订阅链接
 # 如果用户想使用clash类型，那可以在支持的订阅链接结尾加上 &flag=clash.meta
 # github 链接可自己添加ghproxy使用；订阅链接支持 HTTP_PROXY HTTPS_PROXY 环境变量加速拉取
+# 聚合订阅url
+aggregate-url: ""
 sub-urls:
   # - https://example.com/sub.txt
   # - https://example.com/sub2.txt
