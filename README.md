@@ -125,6 +125,7 @@ go run main.go -f /path/to/config.yaml
 
 ## 订阅使用方法
 
+使用v2RayN添加 订阅服务的url: http://127.0.0.1:8199/sub/base64.txt , 如果是个人服务器上部署，将(127.0.0.1)改成服务器IP即可
 
 
 ## 免责声明
