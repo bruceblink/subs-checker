@@ -8,3 +8,5 @@ Dockerfile
 .idea
 .vscode 
 test
+doc
+output
