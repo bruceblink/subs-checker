@@ -57,50 +57,28 @@
 docker run -d \
   --name subs-check \
   -p 8199:8199 \
-  -p 8299:8299 \
   -v ./config:/app/config \
   -v ./output:/app/output \
   --restart always \
-  ghcr.io/beck-8/subs-check:latest
+  ghcr.io/bruceblink/subs-checker:latest
 
 # 使用代理运行
 docker run -d \
   --name subs-check \
   -p 8199:8199 \
-  -p 8299:8299 \
   -e HTTP_PROXY=http://192.168.1.1:7890 \
   -e HTTPS_PROXY=http://192.168.1.1:7890 \
   -v ./config:/app/config \
   -v ./output:/app/output \
   --restart always \
-  ghcr.io/beck-8/subs-check:latest
+  ghcr.io/bruceblink/subs-checker:latest
 ```
 
 ### Docker-Compose
 
-```yaml
-version: "3"
-services:
-  subs-check:
-    image: ghcr.io/beck-8/subs-check:latest
-    container_name: subs-check
-    # mem_limit: 500m
-    volumes:
-      - ./config:/app/config
-      - ./output:/app/output
-    ports:
-      - "8199:8199"
-      - "8299:8299"
-    environment:
-      - TZ=Asia/Shanghai
-      # 是否使用代理
-      # - HTTP_PROXY=http://192.168.1.1:7890
-      # - HTTPS_PROXY=http://192.168.1.1:7890
-      # 设置 api-key
-      # - API_KEY=password
-    restart: always
-    tty: true
-    network_mode: bridge
+```bash
+docker-compose -f .docker-compose.yml up # 正式环境
+docker-compose -f .docker-compose.local.yml up # 本地环境
 ```
 
 ### 源码直接运行
