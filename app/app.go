@@ -6,12 +6,10 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"runtime"
+	_ "runtime"
 	"runtime/debug"
 	"sync/atomic"
 	"time"
-
-	"github.com/bruceblink/subs-checker/assets"
 
 	"github.com/bruceblink/subs-checker/app/monitor"
 	"github.com/bruceblink/subs-checker/check"
@@ -60,19 +58,17 @@ func (app *App) Initialize() error {
 		return fmt.Errorf("加载配置文件失败: %w", err)
 	}
 
+	// 初始化配置文件监听
+	if err := app.initConfigWatcher(); err != nil {
+		return fmt.Errorf("初始化配置文件监听失败: %w", err)
+	}
+
+	app.interval = config.GlobalConfig.CheckInterval
+
 	if config.GlobalConfig.ListenPort != "" {
 		if err := app.initHttpServer(); err != nil {
 			return fmt.Errorf("初始化HTTP服务器失败: %w", err)
 		}
-	}
-
-	if config.GlobalConfig.SubStorePort != "" {
-		if runtime.GOOS == "linux" && runtime.GOARCH == "386" {
-			slog.Warn("node不支持Linux 32位系统，不启动sub-store服务")
-		}
-		go assets.RunSubStoreService()
-		// 求等吗得，日志会按预期顺序输出
-		time.Sleep(500 * time.Millisecond)
 	}
 	// 启动内存监控
 	monitor.StartMemoryMonitor()
@@ -84,10 +80,35 @@ func (app *App) Initialize() error {
 
 // Run 运行应用程序主循环
 func (app *App) Run() {
+	defer func() {
+		err := app.watcher.Close()
+		if err != nil {
+			return
+		}
+		if app.ticker != nil {
+			app.ticker.Stop()
+		}
+		if app.cron != nil {
+			app.cron.Stop()
+		}
+	}()
 
 	slog.Info(fmt.Sprintf("进度展示: %v", config.GlobalConfig.PrintProgress))
-	// 启动节点检测
-	app.triggerCheck()
+
+	// 设置初始定时器模式
+	app.setTimer()
+
+	// 仅在cron表达式为空时，首次启动立即执行检测
+	if config.GlobalConfig.CronExpression != "" {
+		slog.Warn("使用cron表达式，首次启动不立即执行检测")
+	} else {
+		app.triggerCheck()
+	}
+
+	// 在主循环中处理手动触发
+	for range app.checkChan {
+		go app.triggerCheck()
+	}
 }
 
 // setTimer 根据配置设置定时器
@@ -170,6 +191,20 @@ func (app *App) triggerCheck() {
 		os.Exit(1)
 	}
 
+	// 检测完成后显示下次检查时间
+	if app.ticker != nil {
+		// 使用间隔时间模式
+		app.ticker.Reset(time.Duration(app.interval) * time.Minute)
+		nextCheck := time.Now().Add(time.Duration(app.interval) * time.Minute)
+		slog.Info(fmt.Sprintf("下次检查时间: %s", nextCheck.Format("2006-01-02 15:04:05")))
+	} else if app.cron != nil {
+		// 使用cron模式
+		entries := app.cron.Entries()
+		if len(entries) > 0 {
+			nextTime := entries[0].Next
+			slog.Info(fmt.Sprintf("下次检查时间: %s", nextTime.Format("2006-01-02 15:04:05")))
+		}
+	}
 	debug.FreeOSMemory()
 }
 
