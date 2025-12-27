@@ -15,16 +15,21 @@ import (
 
 // initConfigPath 初始化配置文件路径
 func (app *App) initConfigPath() error {
-	if app.configPath == "" {
-		execPath := utils.GetExecutablePath()
-		configDir := filepath.Join(execPath, "config")
-
-		if err := os.MkdirAll(configDir, 0755); err != nil {
-			return fmt.Errorf("创建配置目录失败: %w", err)
-		}
-
-		app.configPath = filepath.Join(configDir, "config.yaml")
+	// 如果命令行参数已经指定配置路径，直接返回
+	if app.configPath != "" {
+		return nil
 	}
+
+	execPath := utils.GetExecutablePath()
+	configDir := filepath.Join(execPath, "config")
+
+	// 确保目录存在
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return fmt.Errorf("创建配置目录失败: %w", err)
+	}
+
+	// 使用默认配置路径（挂载或镜像内置都在这个路径）
+	app.configPath = filepath.Join(configDir, "config.yaml")
 	return nil
 }
 
