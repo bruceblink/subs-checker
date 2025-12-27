@@ -65,12 +65,12 @@ func (ls *LocalSaver) Save(yamlData []byte, filename string) error {
 	}
 
 	// 构建文件路径并保存
-	filepath := filepath.Join(ls.OutputPath, filename)
+	fileSavedPath := filepath.Join(ls.OutputPath, filename)
 
-	if err := os.WriteFile(filepath, yamlData, fileMode); err != nil {
+	if err := os.WriteFile(fileSavedPath, yamlData, fileMode); err != nil {
 		return fmt.Errorf("写入文件失败 [%s]: %w", filename, err)
 	}
-	slog.Info("保存本地成功", "filepath", filepath)
+	slog.Info("保存本地成功", "fileSavedPath", fileSavedPath)
 
 	return nil
 }
