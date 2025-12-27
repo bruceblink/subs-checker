@@ -1,3 +1,7 @@
+version: 2
+
+project_name: subs-checker
+
 before:
   hooks:
     - go mod tidy
@@ -5,7 +9,8 @@ release:
   prerelease: auto  # 自动识别 beta、rc 作为预发布
 
 builds:
-  - env:
+  - id: subs-checker
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -32,7 +37,7 @@ builds:
       - -s -w -X main.Version={{ .Version }} -X main.CurrentCommit={{ .ShortCommit }}
 
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -43,7 +48,7 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 changelog:
   sort: asc
@@ -53,4 +58,4 @@ changelog:
       - '^test:'
       - '^chore:'
       - Merge pull request
-      - Merge branch 
+      - Merge branch
