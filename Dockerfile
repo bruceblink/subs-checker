@@ -4,7 +4,7 @@
 FROM golang:alpine AS builder
 WORKDIR /app
 
-# 提升缓存命中率
+# 仅拷贝 go.mod/go.sum 提升缓存命中率
 COPY go.mod go.sum ./
 RUN go mod download
 
@@ -38,5 +38,14 @@ RUN apk add --no-cache ca-certificates tzdata && \
 # 只拷贝 Go 可执行文件
 COPY --from=builder /app/main /app/main
 
+# 拷贝默认配置文件
+COPY --from=builder /app/config/config.yaml /app/config/config.yaml
+
+# 暴露端口
 EXPOSE 8199
+
+# 默认启动命令，程序内部判断使用外置或内置配置
 CMD ["/app/main"]
+
+# 支持外置挂载配置覆盖
+VOLUME /app/config
